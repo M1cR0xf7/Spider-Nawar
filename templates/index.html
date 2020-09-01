@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>brought to you by Dovahkiin</title>
+</head>
+<body>
+    <h1>Nawar Academy Videos</h1>
+    <h2>brought to you by Dovahkiin</h2>
+
+    <p>Number of scraped videos is {{n}}</p>
+    <br>
+    <p>Sessions are in order.</p>
+    {% for vid in vids %}
+    <br>
+    <video width="400" height="350" controls>
+        <source src="{{ vid[0] }}" type="video/mp4">
+    </video>
+    <br>
+    ----- ----- ----- ----- -----
+    {% endfor %}
+</body>
+</html>
