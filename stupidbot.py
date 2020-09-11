@@ -20,6 +20,13 @@
 # but you can modify the code and add your email and password as strings
 # in their place.
 #
+# CHANGELOG:
+#
+# [0.1.1] - 2020-09-11
+# ### Changed
+# - login function returns a cookie
+# - scrape video session urls from another path.
+#
 # #################### Script Kiddies Cut Here ####################
 import sys
 import os
@@ -33,6 +40,7 @@ from flask import render_template
 # setting up url the and the path
 TARGET_URL = "https://nawaracademy.com"
 LOGIN_PATH = "/en/login"
+VIDEOS_PATH = "/en/student/session_videos"
 
 # get inputs from os enviroment variables (recommended)
 # add them as strings if needed (hardcoding creds in source code is dangerous)
@@ -67,7 +75,7 @@ def set_payload(e: str, p: str, t: str) -> dict:
 
     return payload
 # Login and return HTML with video sessions urls
-def login(e: str, p: str) -> str:
+def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     """
     e: email
     p: password
@@ -93,7 +101,7 @@ def login(e: str, p: str) -> str:
     # print(f"Using the headers: {headers}")
     # print(result.text)
 
-    return result.text
+    return result.cookies
 
 
 class Parser:
@@ -119,8 +127,9 @@ class Parser:
 
 
 def _do_work() -> Parser:
-    page = login(email, password)
-    p = Parser(page)
+    cookie_jar = login(email, password)
+    page = req_session.get(TARGET_URL + VIDEOS_PATH, cookies=cookie_jar)
+    p = Parser(page.text)
     p.get_sessions()
     p.get_video_urls()
     return p
@@ -131,9 +140,9 @@ def main() -> None:
     global urls
     p = _do_work()
     urls = p.urls
-#    print(f"Nimber of videos found: {len(p.urls)}")
-#    for i in urls:
-#        print(i[0])
+    print(f"Nimber of videos found: {len(p.urls)}")
+    for i in urls:
+        print(i[0])
 
 
 # We Wprk on this later
