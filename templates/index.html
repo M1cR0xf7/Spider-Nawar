@@ -9,13 +9,19 @@
 
     <p>Number of scraped videos is {{n}}</p>
     <br>
-    <p>Sessions are in order.</p>
+    <h3>Available Video titles</h3>
+    {% for title in titles %}
+        <p>{{title}}</p>
+    {% endfor %}
+
+    <h2>Sessions are in order.</h2>
     {% for vid in vids %}
     <br>
     <video width="400" height="350" controls>
         <source src="{{ vid[0] }}" type="video/mp4">
     </video>
     <br>
+    <p><a href={{vid[0]}}>{{vid[0]}}</a></p>
     ----- ----- ----- ----- -----
     {% endfor %}
 </body>

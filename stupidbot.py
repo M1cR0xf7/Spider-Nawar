@@ -27,9 +27,15 @@
 # - login function returns a cookie
 # - scrape video session urls from another path.
 #
+# [0.1.2] - 2020-09-22
+# - scraping titles and writing them
+# - adding the video url under the video so it
+#   easies up the process of downloading
+#
 # #################### Script Kiddies Cut Here ####################
 import sys
 import os
+import re
 import requests
 from lxml import html
 from bs4 import BeautifulSoup
@@ -58,6 +64,7 @@ app = Flask(__name__)
 
 p = None
 urls = None
+titles = None
 
 def set_payload(e: str, p: str, t: str) -> dict:
     """
@@ -109,6 +116,7 @@ class Parser:
         self.page = page
         self.sessions = list()
         self.urls = list()
+        self.titles = list()
 
     def get_sessions(self) -> list:
         soup = BeautifulSoup(self.page, 'lxml')
@@ -119,6 +127,21 @@ class Parser:
             self.sessions.append(
                     session.find_all('a', class_='xplay-promo shadow-lg'))
         self.sessions = [x for x in self.sessions if x != []]
+
+    def get_session_titles(self) -> list:
+        soup = BeautifulSoup(self.page, 'lxml')
+        rows = soup.find_all('tr')
+        for i in range(len(rows)):
+            row = str(rows[i])
+            titles = BeautifulSoup(row, 'lxml')
+            self.titles.append(
+                    titles.find_all('span', class_='mx-2'))
+        self.titles = [x for x in self.titles if x != []]
+        for i in range(len(self.titles)):
+            self.titles[i][0] = str(self.titles[i][0])
+            self.titles[i][0] = re.findall(r'>(.*?)<', self.titles[i][0])
+        for i in range(len(self.titles)):
+            self.titles[i] = str(self.titles[i][0][0])
 
     def get_video_urls(self) -> None:
         for i in self.sessions:
@@ -132,14 +155,17 @@ def _do_work() -> Parser:
     p = Parser(page.text)
     p.get_sessions()
     p.get_video_urls()
+    p.get_session_titles()
     return p
 
 
 def main() -> None:
     global p
     global urls
+    global titles
     p = _do_work()
     urls = p.urls
+    titles = p.titles
     print(f"Nimber of videos found: {len(p.urls)}")
     for i in urls:
         print(i[0])
@@ -151,9 +177,10 @@ def webserver():
     if urls is None:
         print("What the fuck is happening?")
         sys.exit(1)
-    return render_template('index.html', vids=urls, n=len(urls))
+    return render_template('index.html',
+            vids=urls, n=len(urls), titles=titles)
 
 
 if __name__ == '__main__':
     main()
-    app.run()
+    app.run(debug=True)
