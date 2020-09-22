@@ -117,7 +117,7 @@ class Parser:
             row = str(rows[i])
             session = BeautifulSoup(row, 'lxml')
             self.sessions.append(
-                    session.find_all('a', class_='play-promo shadow-lg'))
+                    session.find_all('a', class_='xplay-promo shadow-lg'))
         self.sessions = [x for x in self.sessions if x != []]
 
     def get_video_urls(self) -> None:
