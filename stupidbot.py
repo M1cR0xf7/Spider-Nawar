@@ -32,6 +32,11 @@
 # - adding the video url under the video so it
 #   easies up the process of downloading
 #
+# [0.2.0] - 2020-09-23
+# - add a function to print urls next to titles
+# - move _do_work() to main()
+# - running a webserver is not necessary =
+#
 # #################### Script Kiddies Cut Here ####################
 import sys
 import os
@@ -47,6 +52,8 @@ from flask import render_template
 TARGET_URL = "https://nawaracademy.com"
 LOGIN_PATH = "/en/login"
 VIDEOS_PATH = "/en/student/session_videos"
+
+RUN_SERVER = False
 
 # get inputs from os enviroment variables (recommended)
 # add them as strings if needed (hardcoding creds in source code is dangerous)
@@ -81,6 +88,8 @@ def set_payload(e: str, p: str, t: str) -> dict:
     }
 
     return payload
+
+
 # Login and return HTML with video sessions urls
 def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     """
@@ -148,39 +157,38 @@ class Parser:
             root = html.fromstring(str(i[0]))
             self.urls.append(root.xpath('//a/@data-video'))
 
-
-def _do_work() -> Parser:
-    cookie_jar = login(email, password)
-    page = req_session.get(TARGET_URL + VIDEOS_PATH, cookies=cookie_jar)
-    p = Parser(page.text)
-    p.get_sessions()
-    p.get_video_urls()
-    p.get_session_titles()
-    return p
+    def show(self) -> None:
+        for i, j in enumerate(zip(self.titles, self.urls)):
+            print(f"{i} {j}")
 
 
 def main() -> None:
     global p
     global urls
     global titles
-    p = _do_work()
+
+    cookie_jar = login(email, password)
+    page = req_session.get(TARGET_URL + VIDEOS_PATH, cookies=cookie_jar)
+
+    p = Parser(page.text)
+    p.get_sessions()
+    p.get_video_urls()
+    p.get_session_titles()
+
     urls = p.urls
     titles = p.titles
-    print(f"Nimber of videos found: {len(p.urls)}")
-    for i in urls:
-        print(i[0])
 
+    p.show()
 
 # We Wprk on this later
 @app.route('/')
 def webserver():
-    if urls is None:
-        print("What the fuck is happening?")
-        sys.exit(1)
     return render_template('index.html',
             vids=urls, n=len(urls), titles=titles)
 
 
 if __name__ == '__main__':
     main()
-    app.run(debug=True)
+
+    if RUN_SERVER:
+        app.run()
