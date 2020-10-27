@@ -25,7 +25,7 @@
 # [0.1.1] - 2020-09-11
 # ### Changed
 # - login function returns a cookie
-# - scrape video session urls from another path.
+# - scrap video session urls from another path.
 #
 # [0.1.2] - 2020-09-22
 # - scraping titles and writing them
@@ -36,6 +36,10 @@
 # - add a function to print urls next to titles
 # - move _do_work() to main()
 # - running a webserver is not necessary =
+#
+# [0.2.1] - 2020-10-27
+# - control RUN_SERVER var using arguments
+# - fix typos
 #
 # #################### Script Kiddies Cut Here ####################
 import sys
@@ -53,7 +57,10 @@ TARGET_URL = "https://nawaracademy.com"
 LOGIN_PATH = "/en/login"
 VIDEOS_PATH = "/en/student/session_videos"
 
-RUN_SERVER = False
+try:
+    RUN_SERVER = True if sys.argv[1] == "serve" else False
+except:
+    RUN_SERVER = False
 
 # get inputs from os enviroment variables (recommended)
 # add them as strings if needed (hardcoding creds in source code is dangerous)
@@ -180,7 +187,6 @@ def main() -> None:
 
     p.show()
 
-# We Wprk on this later
 @app.route('/')
 def webserver():
     return render_template('index.html',
