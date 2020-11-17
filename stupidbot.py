@@ -14,7 +14,7 @@
 # Goal: list all available video sessions on the site
 # to download and watching it offline (backing it up in case of deletion)
 #
-# License: Public Domain (I release all my shit public domain)
+# License: WTFPL (check COPYING file)
 #
 # Tested On: Gnu/Linux; i do not know if windows has enviroment variables
 # but you can modify the code and add your email and password as strings
@@ -102,7 +102,7 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     """
     e: email
     p: password
-    -> returns the html of the homepage after login with all the sessions
+    -> returns a session cookie
     """
     # Lets start the login attempt
     login_page_result = req_session.get(TARGET_URL + LOGIN_PATH)
@@ -186,6 +186,7 @@ def main() -> None:
     titles = p.titles
 
     p.show()
+
 
 @app.route('/')
 def webserver():
