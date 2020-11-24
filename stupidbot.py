@@ -74,6 +74,12 @@ except Exception as e:
 
 req_session = requests.session()
 
+# in case if you want to use proxy to debug the web requests
+#
+# req_session.proxies.update({"http": "http://127.0.0.1:8080",
+#                             "https": "http://127.0.0.1:8080"})
+# req_session.verify = False
+
 app = Flask(__name__)
 
 p = None
@@ -118,7 +124,7 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     }
 
     result = req_session.post(TARGET_URL + LOGIN_PATH,
-                          data=payload, headers=headers)
+                              data=payload, headers=headers)
 
     # print(f"Using the payload: {payload}")
     # print(f"Using the headers: {headers}")
