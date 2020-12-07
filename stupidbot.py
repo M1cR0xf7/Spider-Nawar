@@ -41,6 +41,13 @@
 # - control RUN_SERVER var using arguments
 # - fix typos
 #
+# [0.2.2] - 2020-12-07
+# - output csv format
+# **UPDATE**
+# This code sucks, it is ugly and unmanitainable. i am thinking
+# about rewriting the Parser class from scratch; not right now or
+# very soon, maybe 2 months later idk.
+#
 # #################### Script Kiddies Cut Here ####################
 import sys
 import os
@@ -59,13 +66,13 @@ VIDEOS_PATH = "/en/student/session_videos"
 
 try:
     RUN_SERVER = True if sys.argv[1] == "serve" else False
-except:
+except Exception:
     RUN_SERVER = False
 
 # get inputs from os enviroment variables (recommended)
 # add them as strings if needed (hardcoding creds in source code is dangerous)
 try:
-    email    = os.environ['EMAIL']  # "youremail@domain.tld"
+    email = os.environ['EMAIL']     # "youremail@domain.tld"
     password = os.environ['PASS']   # "hunter2"
 except Exception as e:
     print("enviroment variables are not set.")
@@ -85,6 +92,7 @@ app = Flask(__name__)
 p = None
 urls = None
 titles = None
+
 
 def set_payload(e: str, p: str, t: str) -> dict:
     """
@@ -120,7 +128,8 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     payload = set_payload(e, p, authenticity_token)
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0"
+        "User-Agent":
+        "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0"
     }
 
     result = req_session.post(TARGET_URL + LOGIN_PATH,
@@ -171,8 +180,12 @@ class Parser:
             self.urls.append(root.xpath('//a/@data-video'))
 
     def show(self) -> None:
+        """
+        tee it to a file with a .csv ext
+        """
+        print("#,name,url")
         for i, j in enumerate(zip(self.titles, self.urls)):
-            print(f"{i} {j}")
+            print(f"{i},{j[0]},{j[1][0]}")
 
 
 def main() -> None:
@@ -196,8 +209,7 @@ def main() -> None:
 
 @app.route('/')
 def webserver():
-    return render_template('index.html',
-            vids=urls, n=len(urls), titles=titles)
+    return render_template('index.html', vids=urls, n=len(urls), titles=titles)
 
 
 if __name__ == '__main__':
