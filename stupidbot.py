@@ -185,7 +185,7 @@ class Parser:
         """
         print("#,name,url")
         for i, j in enumerate(zip(self.titles, self.urls)):
-            print(f"{i},{j[0]},{j[1][0]}")
+            print(f"{i+1},{j[0]},{j[1][0]}")
 
 
 def main() -> None:
