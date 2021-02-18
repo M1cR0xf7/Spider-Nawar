@@ -12,7 +12,15 @@ export PASS="passusedforregisteraTion@123"
 # Run the script
 python ./stupidbot.py
 
-# => 0 video title [video_url]
+# use -d flag to print cookies, payload, headers
+python ./stupidbot.py -d
+
+# use --serve flag to serve http with flask
+python ./stupidbot.py --serve
+
+
+# output (csv format)
+# => 0,video title, http://[video_url]
 # => ...
 
 ```

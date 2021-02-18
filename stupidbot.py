@@ -48,16 +48,27 @@
 # about rewriting the Parser class from scratch; not right now or
 # very soon, maybe 2 months later idk.
 #
+# [0.2.3] - 2020-02-18
+# # added
+# - debug output
+# **UPDATE**
+# they started embedding youtube videos on the website and this script
+# does not support that. i dont have the time to do it.
+# it will output "https://nawaracademy.com" in the url field.
+#
 # #################### Script Kiddies Cut Here ####################
 import sys
 import os
 import re
+
 import requests
 from lxml import html
 from bs4 import BeautifulSoup
 
 from flask import Flask
 from flask import render_template
+
+from fake_useragent import UserAgent
 
 # setting up url the and the path
 TARGET_URL = "https://nawaracademy.com"
@@ -94,6 +105,15 @@ urls = None
 titles = None
 
 
+def _dbg_print(x: str):
+    print(x)
+
+
+if '-d' not in sys.argv:
+    del _dbg_print
+    _dbg_print = lambda x: None
+
+
 def set_payload(e: str, p: str, t: str) -> dict:
     """
     e: email
@@ -127,18 +147,20 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
 
     payload = set_payload(e, p, authenticity_token)
 
+    ua = UserAgent()
+
     headers = {
-        "User-Agent":
-        "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0"
+        "User-Agent": ua.random
     }
 
     result = req_session.post(TARGET_URL + LOGIN_PATH,
                               data=payload, headers=headers)
 
-    # print(f"Using the payload: {payload}")
-    # print(f"Using the headers: {headers}")
-    # print(result.text)
+    _dbg_print(f"Using the payload: {payload}")
+    _dbg_print(f"Using the headers: {headers}")
+    # _dbg_print(result.text)
 
+    _dbg_print(f"Using the cookies: {result.cookies}")
     return result.cookies
 
 
