@@ -56,6 +56,13 @@
 # does not support that. i dont have the time to do it.
 # it will output "https://nawaracademy.com" in the url field.
 #
+# [0.3.0] - 2021-02-28
+# - parsing youtube videos
+# **update**
+# now parsing youtube videos without titles and i really dont care
+# and i will not implement this.
+# this project is done. i am out.
+#
 # #################### Script Kiddies Cut Here ####################
 import sys
 import os
@@ -74,6 +81,8 @@ from fake_useragent import UserAgent
 TARGET_URL = "https://nawaracademy.com"
 LOGIN_PATH = "/en/login"
 VIDEOS_PATH = "/en/student/session_videos"
+YT_SHORT = "https://youtu.be/"
+
 
 try:
     RUN_SERVER = True if sys.argv[1] == "serve" else False
@@ -106,12 +115,16 @@ titles = None
 
 
 def _dbg_print(x: str):
+    # give more output
     print(x)
 
 
 if '-d' not in sys.argv:
     del _dbg_print
     _dbg_print = lambda x: None
+
+
+_dbg_print("[!] verbose mode enabled.")
 
 
 def set_payload(e: str, p: str, t: str) -> dict:
@@ -150,7 +163,7 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     ua = UserAgent()
 
     headers = {
-        "User-Agent": ua.random
+        "User-Agent": ua.chrome
     }
 
     result = req_session.post(TARGET_URL + LOGIN_PATH,
@@ -165,11 +178,16 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
 
 
 class Parser:
-    def __init__(self, page: str) -> None:
+    def __init__(self,
+                 page: str,
+                 cookies: requests.cookies.RequestsCookieJar) -> None:
         self.page = page
+        self.cookies = cookies
         self.sessions = list()
         self.urls = list()
         self.titles = list()
+        self.yt_vids = list()
+        self.yt_shorts = list()
 
     def get_sessions(self) -> list:
         soup = BeautifulSoup(self.page, 'lxml')
@@ -199,7 +217,29 @@ class Parser:
     def get_video_urls(self) -> None:
         for i in self.sessions:
             root = html.fromstring(str(i[0]))
-            self.urls.append(root.xpath('//a/@data-video'))
+            x = root.xpath('//a/@data-video')
+            y = root.xpath('//a/@href')
+            _dbg_print(f"{x[0]} // {type(str(x[0]))}")
+            if re.match("^https://nawaracademy.com$", str(x[0])):
+                self.yt_vids.append(y[0])
+            self.urls.append(x)
+        self.maybe_yt(self.cookies)
+
+    def maybe_yt(self, cookies):
+        """
+        get url of embedded youtube video
+        """
+        # _dbg_print(f"YOUTUBE => {self.yt_vids} ")
+        for i in self.yt_vids:
+            # _dbg_print(f"{str(i)} // {type(str(i))}")
+            soup = BeautifulSoup(req_session.get(
+                str(i),
+                cookies=cookies).text,
+                'lxml')
+            vid_id = str(soup.find("div",
+                {"id": "video-player"}
+                )['data-plyr-embed-id'])
+            self.yt_shorts.append(YT_SHORT + vid_id)
 
     def show(self) -> None:
         """
@@ -208,6 +248,9 @@ class Parser:
         print("#,name,url")
         for i, j in enumerate(zip(self.titles, self.urls)):
             print(f"{i+1},{j[0]},{j[1][0]}")
+        print("0,Embedded youtube vids,0")
+        for i in self.yt_shorts:
+            print(f"0,0,{i}")
 
 
 def main() -> None:
@@ -218,7 +261,7 @@ def main() -> None:
     cookie_jar = login(email, password)
     page = req_session.get(TARGET_URL + VIDEOS_PATH, cookies=cookie_jar)
 
-    p = Parser(page.text)
+    p = Parser(page.text, cookie_jar)
     p.get_sessions()
     p.get_video_urls()
     p.get_session_titles()
