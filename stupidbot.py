@@ -159,11 +159,11 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     payload = set_payload(e, p, authenticity_token)
 
     ua = ''
-    with open('ua.txt') as f:
-        ua = f.readlines()
+    with open('ua.txt', 'r') as f:
+        ua = f.read()
 
     headers = {
-        "User-Agent": ua[0]
+        "User-Agent": "".join([i.strip('\n') for i in str(ua)])
     }
 
     result = req_session.post(TARGET_URL + LOGIN_PATH,
