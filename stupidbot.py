@@ -75,8 +75,6 @@ from bs4 import BeautifulSoup
 from flask import Flask
 from flask import render_template
 
-from fake_useragent import UserAgent
-
 # setting up url the and the path
 TARGET_URL = "https://nawaracademy.com"
 LOGIN_PATH = "/en/login"
@@ -160,10 +158,12 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
 
     payload = set_payload(e, p, authenticity_token)
 
-    ua = UserAgent()
+    ua = ''
+    with open('ua.txt') as f:
+        ua = f.readlines()
 
     headers = {
-        "User-Agent": ua.chrome
+        "User-Agent": ua[0]
     }
 
     result = req_session.post(TARGET_URL + LOGIN_PATH,
@@ -219,8 +219,8 @@ class Parser:
             root = html.fromstring(str(i[0]))
             x = root.xpath('//a/@data-video')
             y = root.xpath('//a/@href')
-            _dbg_print(f"{x[0]} // {type(str(x[0]))}")
-            if re.match("^https://nawaracademy.com$", str(x[0])):
+            # _dbg_print(f"{x[0]} // {type(str(x[0]))}")
+            if re.match(f"^{TARGET_URL}$", str(x[0])):
                 self.yt_vids.append(y[0])
             self.urls.append(x)
         self.maybe_yt(self.cookies)
