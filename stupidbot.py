@@ -158,7 +158,6 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
 
     payload = set_payload(e, p, authenticity_token)
 
-    ua = ''
     with open('ua.txt', 'r') as f:
         ua = f.read()
 
