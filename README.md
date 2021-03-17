@@ -2,6 +2,8 @@
 
 -- **__alternate interface for nawaracademy.com__** --
 
+watch nawar's lessons without opening the browser and wasting resources.
+
 ## Usage
 
 ```bash
@@ -15,8 +17,8 @@ python ./stupidbot.py
 # use -d flag to print cookies, payload, headers
 python ./stupidbot.py -d
 
-# use --serve flag to serve http with flask
-python ./stupidbot.py --serve
+# use serve argument to serve http with flask (must be the first argument)
+python ./stupidbot.py serve
 
 
 # output (csv format)
