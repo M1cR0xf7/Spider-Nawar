@@ -33,7 +33,7 @@ to activate the webserver change the RUN_SERVER variable from False to True.
 
 the code is not working anymore.
 
-[screenshot](./screenshot.png)
+![screenshot](./screenshot.png)
 
 that's a screenshot of the page that is used to extract information from.
 
