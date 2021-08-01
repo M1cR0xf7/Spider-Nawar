@@ -153,6 +153,7 @@ def login(e: str, p: str) -> requests.cookies.RequestsCookieJar:
     login_page_result = req_session.get(TARGET_URL + LOGIN_PATH)
     tree = html.fromstring(login_page_result.text)
     # print(login_page_result.text)
+
     authenticity_token = list(
             set(tree.xpath("//input[@name='_token']/@value")))[0]
 
