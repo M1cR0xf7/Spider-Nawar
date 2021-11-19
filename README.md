@@ -1,5 +1,10 @@
 # _Spider Nawar_
 
+** UPDATE **
+
+__the code is not working anymore.__
+
+
 -- **__alternate interface for nawaracademy.com__** --
 
 watch nawar's lessons without opening the browser and wasting resources.
@@ -28,10 +33,6 @@ python ./stupidbot.py serve
 ```
 
 to activate the webserver change the RUN_SERVER variable from False to True.
-
-** UPDATE
-
-the code is not working anymore.
 
 ![screenshot](./screenshot.png)
 
