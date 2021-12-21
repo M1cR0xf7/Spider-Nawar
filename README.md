@@ -39,6 +39,12 @@ to activate the webserver change the RUN_SERVER variable from False to True.
 that's a screenshot of the page that is used to extract information from.
 
 
+![video](./nawar.mp4)
+
+old demo
+
+data stored [here](./censored.csv).
+
 > Do not use it
 
 -- M1cR0xf7
